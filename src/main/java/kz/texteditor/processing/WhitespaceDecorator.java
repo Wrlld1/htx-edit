@@ -1,5 +1,10 @@
 package kz.texteditor.processing;
 
+/**
+ * Concrete Decorator that executes its delegate first, then collapses sequences
+ * of spaces and tabs into a single space and trims line edges while preserving
+ * line breaks and empty lines.
+ */
 public class WhitespaceDecorator extends TextProcessorDecorator {
     public WhitespaceDecorator(TextProcessor delegate) {
         super(delegate);
