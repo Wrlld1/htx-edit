@@ -30,7 +30,7 @@ Since we push directly to `main`, please stick to these rules so we don't break 
 Use short prefixes for commits:
 
 * `feat:` - new classes or patterns (e.g., `feat: add ProcessingOptions builder`)
-* `refactor:` — code cleanup or restructuring without changing behavior
+* `refactor:` - code cleanup or restructuring without changing behavior
 * `fix:` - bug fixes
 * `test:` - adding or updating tests
 * `docs:` - README, UML diagrams, or report files
