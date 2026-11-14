@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '**.puml'
+  workflow_dispatch:
 
 permissions:
   contents: write
