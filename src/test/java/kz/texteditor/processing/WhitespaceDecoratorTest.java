@@ -22,6 +22,21 @@ public class WhitespaceDecoratorTest {
         assertEquals(expected, output);
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "'  ПриВеТ,   WoRlD!  ', 'ПриВеТ, WoRlD!'",
+            "'  Привет ,мир!Как   дела ?  ', 'Привет ,мир!Как дела ?'",
+            "'  « Привет,   мир! »  ', '« Привет, мир! »'",
+            "'  \" Привет,   мир! \"  ', '\" Привет, мир! \"'",
+            "'line 1\n\n\nline 2', 'line 1\n\n\nline 2'"
+    })
+    void doesNotInterfereWithOtherDecorators(String input, String expected) {
+        WhitespaceDecorator decorator = new WhitespaceDecorator(
+                                        new BaseTextProcessor(
+                                        new KeepCaseStrategy()));
+        assertEquals(expected, decorator.process(input));
+    }
+
     @Test
     void decoratorChainingWorks() {
         TextProcessor processor = new WhitespaceDecorator(
