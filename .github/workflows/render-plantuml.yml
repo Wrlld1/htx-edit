@@ -1,0 +1,28 @@
+name: Render PlantUML Diagrams
+
+on:
+  push:
+    paths:
+      - '**.puml'
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PlantUML and Graphviz
+        run: sudo apt-get update && sudo apt-get install -y plantuml graphviz
+
+      - name: Render .puml files to SVG
+        run: find . -name "*.puml" -exec plantuml -tsvg {} +
+
+      - name: Commit and push generated SVGs
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: auto-render PlantUML SVGs"
+          file_pattern: "*.svg"
