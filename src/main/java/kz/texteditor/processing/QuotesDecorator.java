@@ -19,7 +19,7 @@ public class QuotesDecorator extends TextProcessorDecorator {
 
     @Override
     public String process(String text) {
-        String processedText = delegate.process(text);
+        String processedText = super.process(text);
         String finalText = GUILLEMETS_REGEX.matcher(processedText).replaceAll("«$1»");
         return DOUBLE_QUOTES_REGEX.matcher(finalText).replaceAll("\"$1\"");
     }

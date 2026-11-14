@@ -1,5 +1,7 @@
 package kz.texteditor.processing;
 
+import java.util.Objects;
+
 /**
  * Service entry point that dynamically assembles the CaseStrategy and
  * TextProcessorDecorator chain based on the provided ProcessingOptions,
@@ -7,6 +9,9 @@ package kz.texteditor.processing;
  */
 public class ProcessingService {
     public String process(String text, ProcessingOptions options) {
+        Objects.requireNonNull(text, "Input text cannot be null");
+        Objects.requireNonNull(options, "Processing options cannot be null");
+
         CaseStrategy strategy = switch (options.caseMode()) {
             case KEEP -> new KeepCaseStrategy();
             case UPPER -> new UpperCaseStrategy();

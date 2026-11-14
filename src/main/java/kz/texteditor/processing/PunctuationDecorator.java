@@ -19,7 +19,7 @@ public class PunctuationDecorator extends TextProcessorDecorator {
 
     @Override
     public String process(String text) {
-        String processedText = delegate.process(text);
+        String processedText = super.process(text);
         String newDecorated = STRIP_SPACES_REGEX.matcher(processedText).replaceAll("");
         return NORMALIZE_AFTER_REGEX.matcher(newDecorated).replaceAll("$1 ");
     }
