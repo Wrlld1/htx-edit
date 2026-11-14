@@ -1,5 +1,7 @@
 package kz.texteditor.processing;
 
+import kz.texteditor.processing.builder.CaseMode;
+import kz.texteditor.processing.builder.ProcessingOptions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

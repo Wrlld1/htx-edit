@@ -1,5 +1,13 @@
 package kz.texteditor.processing;
 
+import kz.texteditor.processing.builder.CaseMode;
+import kz.texteditor.processing.builder.ProcessingOptions;
+import kz.texteditor.processing.decorator.*;
+import kz.texteditor.processing.strategy.CaseStrategy;
+import kz.texteditor.processing.strategy.KeepCaseStrategy;
+import kz.texteditor.processing.strategy.LowerCaseStrategy;
+import kz.texteditor.processing.strategy.UpperCaseStrategy;
+
 import java.util.Map;
 import java.util.Objects;
 

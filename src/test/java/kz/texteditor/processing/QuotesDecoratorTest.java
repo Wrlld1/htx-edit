@@ -1,5 +1,8 @@
 package kz.texteditor.processing;
 
+import kz.texteditor.processing.decorator.*;
+import kz.texteditor.processing.strategy.KeepCaseStrategy;
+import kz.texteditor.processing.strategy.UpperCaseStrategy;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
