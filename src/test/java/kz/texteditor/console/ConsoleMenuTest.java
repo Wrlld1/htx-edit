@@ -25,7 +25,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Сквозные проверки через меню со скриптом ввода. */
+/** End-to-end tests through the menu using scripted input. */
 class ConsoleMenuTest {
 
     @TempDir

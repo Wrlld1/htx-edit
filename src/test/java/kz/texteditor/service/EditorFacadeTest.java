@@ -33,7 +33,7 @@ class EditorFacadeTest {
         Map<ExportFormat, ExportJob> jobs = new EnumMap<>(ExportFormat.class);
         jobs.put(ExportFormat.TXT, new TxtExportJob(files));
         jobs.put(ExportFormat.HTML, new HtmlExportJob(files));
-        // все правила выключены по умолчанию, поэтому результат не зависит от реализации ProcessingService
+        // All rules are disabled by default, so the result does not depend on the ProcessingService implementation.
         facade = new EditorFacade(new EditorModel(), new ProcessingService(), files, jobs);
     }
 

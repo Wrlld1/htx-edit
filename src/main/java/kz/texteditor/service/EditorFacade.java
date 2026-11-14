@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Facade: единая точка входа для консоли. Скрывает модель, обработку, файлы и экспорт.
- * Подписчиков фасад не вызывает - это делает модель.
+ * Facade: a single entry point for the console. Hides the model, processing, files, and export.
+ * The facade does not notify observers; the model does that.
  */
 public class EditorFacade {
 
@@ -36,7 +36,7 @@ public class EditorFacade {
         this.exportJobs = Map.copyOf(exportJobs);
     }
 
-    /** Пункт 2: читает TXT и заменяет исходник. При ошибке текущий текст не меняется. */
+    /** Option 2: reads a TXT file and replaces the source text. The current text remains unchanged on error. */
     public void open(String path) {
         Path file = toPath(path);
         try {
@@ -46,24 +46,24 @@ public class EditorFacade {
         }
     }
 
-    /** Пункт 1: заменяет исходник введённым текстом. */
+    /** Option 1: replaces the source text with the entered text. */
     public void updateSource(String text) {
         model.setSource(text);
     }
 
-    /** Пункт 3: заменяет настройки обработки. */
+    /** Option 3: replaces the processing options. */
     public void updateOptions(ProcessingOptions options) {
         model.setOptions(options);
     }
 
-    /** Пункт 4: обрабатывает исходник текущими настройками и записывает результат в модель. */
+    /** Option 4: processes the source with the current options and stores the result in the model. */
     public void processText() {
         EditorSnapshot state = model.snapshot();
         String result = processingService.process(state.sourceText(), state.options());
         model.setResult(result);
     }
 
-    /** Пункты 6 и 7: сохраняет только актуальный результат. */
+    /** Options 6 and 7: saves only the current result. */
     public void saveResult(ExportFormat format, String path) {
         EditorSnapshot state = model.snapshot();
         if (!state.resultCurrent()) {

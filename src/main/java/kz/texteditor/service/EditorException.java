@@ -1,6 +1,6 @@
 package kz.texteditor.service;
 
-/** Понятная пользователю ошибка сценария. Сообщение выводится консолью как есть. */
+/** A user-friendly workflow error. The console displays the message as-is. */
 public class EditorException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

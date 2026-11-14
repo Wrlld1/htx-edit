@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/** Консольный интерфейс: читает команды и печатает сообщения. Вся логика - в {@link EditorFacade}. */
+/** Console interface: reads commands and prints messages. All logic is in {@link EditorFacade}. */
 public class ConsoleMenu {
 
     private static final String END_MARKER = ":end";
@@ -33,7 +33,7 @@ public class ConsoleMenu {
         this.out = out;
     }
 
-    /** Главный цикл. Завершается по пункту 0 или при конце ввода. */
+    /** Main loop. Exits when option 0 is selected or when input ends. */
     public void run() {
         boolean running = true;
         while (running) {
@@ -50,7 +50,7 @@ public class ConsoleMenu {
         }
     }
 
-    // ---------- главное меню ----------
+    // ---------- main menu ----------
 
     private void printMainMenu() {
         out.println();
@@ -67,7 +67,7 @@ public class ConsoleMenu {
         out.flush();
     }
 
-    /** @return false, если пользователь выбрал выход */
+    /** @return false if the user chose to exit */
     private boolean handleMainChoice(String choice) {
         switch (choice) {
             case "1" -> enterText();
@@ -123,7 +123,7 @@ public class ConsoleMenu {
         statistics.resultStatistics().ifPresent(stats -> out.println("Статистика: " + stats));
     }
 
-    // ---------- сохранение ----------
+    // ---------- saving ----------
 
     private void save(ExportFormat format, String defaultPath) {
         if (!facade.canSave()) {
@@ -142,7 +142,7 @@ public class ConsoleMenu {
         out.println("Результат сохранён: " + path);
     }
 
-    // ---------- настройки ----------
+    // ---------- settings ----------
 
     private void settingsMenu() {
         while (true) {
@@ -210,7 +210,7 @@ public class ConsoleMenu {
         };
     }
 
-    // ---------- ввод ----------
+    // ---------- input ----------
 
     private String ask(String prompt) {
         out.print(prompt);
@@ -223,7 +223,7 @@ public class ConsoleMenu {
         return YES.contains(ask(prompt).toLowerCase());
     }
 
-    /** @return строка или null при конце ввода / ошибке чтения */
+    /** @return the input line, or null if input ends or a read error occurs */
     private String readLine() {
         try {
             return in.readLine();

@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.EnumMap;
 import java.util.Map;
 
-/** Точка входа: создаёт зависимости, один раз подписывает наблюдателей и запускает меню. */
+/** Entry point: creates dependencies, registers observers once, and starts the menu. */
 public final class Main {
 
     private Main() { }
