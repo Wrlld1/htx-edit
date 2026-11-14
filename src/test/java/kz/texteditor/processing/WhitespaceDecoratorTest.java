@@ -15,15 +15,19 @@ public class WhitespaceDecoratorTest {
             "'', ''"
     })
     void rulesAreEnforced(String input, String expected) {
-        WhitespaceDecorator decorator = new WhitespaceDecorator(new BaseTextProcessor(new KeepCaseStrategy()));
+        WhitespaceDecorator decorator = new WhitespaceDecorator(
+                                        new BaseTextProcessor(
+                                        new KeepCaseStrategy()));
         String output = decorator.process(input);
         assertEquals(expected, output);
     }
 
     @Test
     void decoratorChainingWorks() {
-        WhitespaceDecorator formatUpper = new WhitespaceDecorator(new BaseTextProcessor(new UpperCaseStrategy()));
-        String output = formatUpper.process("  Привет,   world!  ");
+        TextProcessor processor = new WhitespaceDecorator(
+                                  new BaseTextProcessor(
+                                  new UpperCaseStrategy()));
+        String output = processor.process("  Привет,   world!  ");
         assertEquals("ПРИВЕТ, WORLD!", output);
     }
 }
