@@ -1,11 +1,15 @@
 package kz.texteditor.processing;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ProcessingServiceTest {
+    private final ProcessingService service = new ProcessingService();
+
     @ParameterizedTest
     @CsvSource({
             "false, false, false, KEEP,   '  « Привет , мир ! »  ', '  « Привет , мир ! »  '",
@@ -27,8 +31,18 @@ public class ProcessingServiceTest {
                 .trimQuotes(quotes)
                 .caseMode(mode)
                 .build();
-        ProcessingService service = new ProcessingService();
         String output = service.process(input, options);
         assertEquals(expected, output);
+    }
+
+    @Test
+    void nullTextThrowsException() {
+        ProcessingOptions options = ProcessingOptions.defaults();
+        assertThrows(NullPointerException.class, () -> service.process(null, options));
+    }
+
+    @Test
+    void nullOptionsThrowsException() {
+        assertThrows(NullPointerException.class, () -> service.process("text", null));
     }
 }

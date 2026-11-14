@@ -6,8 +6,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CaseProcessingTest {
+    private static final CaseStrategy UPPER = new UpperCaseStrategy();
+    private static final CaseStrategy LOWER = new LowerCaseStrategy();
+    private static final CaseStrategy KEEP = new KeepCaseStrategy();
+
     @ParameterizedTest
     @CsvSource({
             "hello, HELLO",
@@ -17,8 +22,7 @@ public class CaseProcessingTest {
             "'', ''"
     })
     void upperCaseConvertsAllSupportedLanguages(String input, String expected) {
-        CaseStrategy strategy = new UpperCaseStrategy();
-        String output = strategy.apply(input);
+        String output = UPPER.apply(input);
         assertEquals(expected, output);
     }
 
@@ -31,8 +35,7 @@ public class CaseProcessingTest {
             "'', ''"
     })
     void lowerCaseConvertsAllSupportedLanguages(String input, String expected) {
-        CaseStrategy strategy = new LowerCaseStrategy();
-        String output = strategy.apply(input);
+        String output = LOWER.apply(input);
         assertEquals(expected, output);
     }
 
@@ -45,29 +48,40 @@ public class CaseProcessingTest {
             "'', ''"
     })
     void keepCaseDoesNothing(String input, String expected) {
-        CaseStrategy strategy = new KeepCaseStrategy();
-        String output = strategy.apply(input);
+        String output = KEEP.apply(input);
         assertEquals(expected, output);
     }
 
     @Test
     void textProcessorDelegatesToStrategy() {
-        assertEqualsProcessed(new UpperCaseStrategy(), "Hello", "HELLO");
-        assertEqualsProcessed(new LowerCaseStrategy(), "Привет", "привет");
-        assertEqualsProcessed(new KeepCaseStrategy(), "Сәлем", "Сәлем");
+        assertEqualsProcessed(UPPER, "Hello", "HELLO");
+        assertEqualsProcessed(LOWER, "Привет", "привет");
+        assertEqualsProcessed(KEEP, "Сәлем", "Сәлем");
     }
 
     @Test
     @DefaultLocale("tr-TR")
     void caseConversionIgnoresSystemLocale() {
-        assertEquals("II", new UpperCaseStrategy().apply("iI"));
-        assertEquals("ii", new LowerCaseStrategy().apply("iI"));
-        assertEquals("iI", new KeepCaseStrategy().apply("iI"));
+        assertEquals("II", UPPER.apply("iI"));
+        assertEquals("ii", LOWER.apply("iI"));
+        assertEquals("iI", KEEP.apply("iI"));
     }
 
     private void assertEqualsProcessed(CaseStrategy strategy, String input, String expected) {
         BaseTextProcessor textProcessor = new BaseTextProcessor(strategy);
         String output = textProcessor.process(input);
         assertEquals(expected, output);
+    }
+
+    @Test
+    void nullStrategyThrowsException() {
+        assertThrows(NullPointerException.class, () -> new BaseTextProcessor(null));
+    }
+
+    @Test
+    void nullDelegateThrowsException() {
+        assertThrows(NullPointerException.class, () -> new WhitespaceDecorator(null));
+        assertThrows(NullPointerException.class, () -> new PunctuationDecorator(null));
+        assertThrows(NullPointerException.class, () -> new QuotesDecorator(null));
     }
 }
