@@ -36,8 +36,8 @@ class ConsoleMenuTest {
     private String run(String... inputLines) {
         FileService files = new FileService();
         Map<ExportFormat, ExportJob> jobs = new EnumMap<>(ExportFormat.class);
-        jobs.put(ExportFormat.TXT, new TxtExportJob(files));
-        jobs.put(ExportFormat.HTML, new HtmlExportJob(files));
+        jobs.put(ExportFormat.TXT, new TxtExportJob());
+        jobs.put(ExportFormat.HTML, new HtmlExportJob());
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(buffer, true, StandardCharsets.UTF_8);

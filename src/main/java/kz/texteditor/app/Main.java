@@ -30,8 +30,8 @@ public final class Main {
 
         FileService fileService = new FileService();
         Map<ExportFormat, ExportJob> exportJobs = new EnumMap<>(ExportFormat.class);
-        exportJobs.put(ExportFormat.TXT, new TxtExportJob(fileService));
-        exportJobs.put(ExportFormat.HTML, new HtmlExportJob(fileService));
+        exportJobs.put(ExportFormat.TXT, new TxtExportJob());
+        exportJobs.put(ExportFormat.HTML, new HtmlExportJob());
 
         EditorModel model = new EditorModel();
         StatisticsObserver statistics = new StatisticsObserver();

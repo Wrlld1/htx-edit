@@ -31,8 +31,8 @@ class EditorFacadeTest {
     void setUp() {
         FileService files = new FileService();
         Map<ExportFormat, ExportJob> jobs = new EnumMap<>(ExportFormat.class);
-        jobs.put(ExportFormat.TXT, new TxtExportJob(files));
-        jobs.put(ExportFormat.HTML, new HtmlExportJob(files));
+        jobs.put(ExportFormat.TXT, new TxtExportJob());
+        jobs.put(ExportFormat.HTML, new HtmlExportJob());
         // All rules are disabled by default, so the result does not depend on the ProcessingService implementation.
         facade = new EditorFacade(new EditorModel(), new ProcessingService(), files, jobs);
     }

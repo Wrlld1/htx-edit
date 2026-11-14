@@ -16,4 +16,8 @@ public class FileService {
     public void write(String text, Path path) throws IOException {
         Files.writeString(path, text, StandardCharsets.UTF_8);
     }
+
+    public boolean exists(Path path) {
+    return Files.exists(path);
+}
 }
