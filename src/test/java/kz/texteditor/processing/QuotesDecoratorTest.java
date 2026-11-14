@@ -7,6 +7,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class QuotesDecoratorTest {
+    private final QuotesDecorator decorator = new QuotesDecorator(
+                                              new BaseTextProcessor(
+                                              new KeepCaseStrategy()));
+
     @ParameterizedTest
     @CsvSource({
             "'« Привет, мир! »', '«Привет, мир!»'",
@@ -17,9 +21,6 @@ public class QuotesDecoratorTest {
             "'', ''"
     })
     void rulesAreEnforced(String input, String expected) {
-        QuotesDecorator decorator = new QuotesDecorator(
-                                    new BaseTextProcessor(
-                                    new KeepCaseStrategy()));
         String output = decorator.process(input);
         assertEquals(expected, output);
     }
@@ -33,9 +34,6 @@ public class QuotesDecoratorTest {
             "'Он сказал « Привет, мир!', 'Он сказал « Привет, мир!'"
     })
     void doesNotInterfereWithOtherDecorators(String input, String expected) {
-        QuotesDecorator decorator = new QuotesDecorator(
-                                    new BaseTextProcessor(
-                                    new KeepCaseStrategy()));
         String output = decorator.process(input);
         assertEquals(expected, output);
     }

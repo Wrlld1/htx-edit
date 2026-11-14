@@ -7,6 +7,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WhitespaceDecoratorTest {
+    private final WhitespaceDecorator decorator = new WhitespaceDecorator(
+                                                  new BaseTextProcessor(
+                                                  new KeepCaseStrategy()));
+
     @ParameterizedTest
     @CsvSource({
             "'  hello   world  ', 'hello world'",
@@ -15,9 +19,6 @@ public class WhitespaceDecoratorTest {
             "'', ''"
     })
     void rulesAreEnforced(String input, String expected) {
-        WhitespaceDecorator decorator = new WhitespaceDecorator(
-                                        new BaseTextProcessor(
-                                        new KeepCaseStrategy()));
         String output = decorator.process(input);
         assertEquals(expected, output);
     }
@@ -31,10 +32,8 @@ public class WhitespaceDecoratorTest {
             "'line 1\n\n\nline 2', 'line 1\n\n\nline 2'"
     })
     void doesNotInterfereWithOtherDecorators(String input, String expected) {
-        WhitespaceDecorator decorator = new WhitespaceDecorator(
-                                        new BaseTextProcessor(
-                                        new KeepCaseStrategy()));
-        assertEquals(expected, decorator.process(input));
+        String output = decorator.process(input);
+        assertEquals(expected, output);
     }
 
     @Test
