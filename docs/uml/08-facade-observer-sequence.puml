@@ -1,0 +1,117 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam dpi 300
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam sequence {
+    ArrowColor #334155
+    LifeLineBorderColor #475569
+    LifeLineBackgroundColor #FFFFFF
+    ParticipantBorderColor #334155
+    ParticipantBackgroundColor #FFFFFF
+    ParticipantFontColor #0F172A
+    ParticipantFontStyle bold
+    BoxBorderColor #94A3B8
+    BoxFontColor #1E293B
+    BoxFontSize 12
+    NoteBackgroundColor #FFFBEB
+    NoteBorderColor #F59E0B
+}
+
+autonumber "<b>[00]"
+
+actor User
+
+box "CLI Controller (console)" #F8FAFC
+    participant ":ConsoleMenu" as Menu
+end box
+
+box "Facade Pattern (service.facade)" #F5F3FF
+    participant ":EditorFacade" as Facade
+    participant ":ProcessingService" as Proc
+end box
+
+box "Observer Pattern (model.observer & console.observer)" #ECFEFF
+    participant ":EditorModel" as Model
+    participant ":ResultObserver" as ResObs
+    participant ":StatisticsObserver" as StatObs
+end box
+
+== 1. Process Text & Notify Both Observers ==
+User -> Menu : Selects "4. Обработать текст"
+activate Menu
+
+Menu -> Facade : processText()
+activate Facade
+
+Facade -> Model : snapshot()
+Model --> Facade : snapshot(sourceText, options)
+
+Facade -> Proc : process(sourceText, options)
+activate Proc
+Proc --> Facade : resultText
+deactivate Proc
+
+Facade -> Model : setResult(resultText)
+activate Model
+note right of Model
+  resultCurrent = true
+  resultVersion++
+end note
+
+Model -> ResObs : onChanged(newSnapshot)
+activate ResObs
+ResObs --> User : Prints "--- Результат ---"
+deactivate ResObs
+
+Model -> StatObs : onChanged(newSnapshot)
+activate StatObs
+StatObs -> StatObs : TextStatistics.of(source & result)
+deactivate StatObs
+
+Model --> Facade
+deactivate Model
+Facade --> Menu
+deactivate Facade
+
+Menu -> StatObs : resultStatistics()
+StatObs --> Menu : Optional<TextStatistics>
+Menu --> User : Prints "Статистика результата: ..."
+deactivate Menu
+
+== 2. Option Change Invalidates Result & Blocks Saving ==
+User -> Menu : Toggles setting in Menu 3
+activate Menu
+Menu -> Facade : updateOptions(newOptions)
+activate Facade
+Facade -> Model : setOptions(newOptions)
+activate Model
+note right of Model
+  resultCurrent = false
+end note
+
+Model -> ResObs : onChanged(staleSnapshot)
+activate ResObs
+ResObs --> User : Prints "Результат устарел: нужна обработка."
+deactivate ResObs
+
+Model -> StatObs : onChanged(staleSnapshot)
+activate StatObs
+deactivate StatObs
+
+Model --> Facade
+deactivate Model
+Facade --> Menu
+deactivate Facade
+deactivate Menu
+
+User -> Menu : Selects "6. Сохранить результат в TXT"
+activate Menu
+Menu -> Facade : canSave()
+Facade -> Model : snapshot()
+Model --> Facade : staleSnapshot(resultCurrent = false)
+Facade --> Menu : false
+Menu --> User : Prints "Сначала обработайте текст"
+deactivate Menu
+@enduml

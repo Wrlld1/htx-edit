@@ -1,0 +1,143 @@
+@startuml
+' ==================== STRICT & SLICK STYLING ====================
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam nodesep 45
+skinparam ranksep 55
+skinparam dpi 300
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+skinparam package {
+    BackgroundColor #FFFFFF
+    BorderColor #334155
+    BorderThickness 1.5
+    FontColor #0F172A
+    FontSize 14
+    FontStyle bold
+}
+
+skinparam rectangle {
+    BorderStyle dashed
+    BorderThickness 1.5
+    RoundCorner 10
+    FontSize 13
+    FontStyle bold
+}
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #475569
+    BorderThickness 1.2
+    HeaderBackgroundColor #F1F5F9
+    FontColor #0F172A
+    AttributeFontColor #1E293B
+    MethodFontColor #0F172A
+    StereotypeFontColor #475569
+    StereotypeFontSize 11
+    ArrowColor #334155
+    ArrowFontColor #334155
+    ArrowFontSize 11
+}
+
+skinparam interface {
+    HeaderBackgroundColor #E2E8F0
+}
+
+package "Text Processing Subsystem: Strategy & Decorator" {
+
+    ' ==================== PIPELINE ASSEMBLER ====================
+    rectangle "Pipeline Assembler (kz.texteditor.processing)" as ServiceBox #F8FAFC;line:94A3B8;text:334155 {
+        class ProcessingService <<PipelineAssembler>> {
+            - {static} STRATEGIES : Map<CaseMode, CaseStrategy> {readOnly}
+            --
+            + process(text : String, options : ProcessingOptions) : String
+        }
+    }
+
+    ' ==================== STRATEGY PATTERN ====================
+    rectangle "Strategy Pattern (kz.texteditor.processing.strategy)" as StrategyBox #EFF6FF;line:60A5FA;text:1E3A8A {
+        interface CaseStrategy <<interface, Strategy>> {
+            + {abstract} apply(text : String) : String
+        }
+
+        class KeepCaseStrategy <<ConcreteStrategy>> {
+            + apply(text : String) : String
+        }
+
+        class UpperCaseStrategy <<ConcreteStrategy>> {
+            + apply(text : String) : String
+        }
+
+        class LowerCaseStrategy <<ConcreteStrategy>> {
+            + apply(text : String) : String
+        }
+    }
+
+    ' ==================== DECORATOR PATTERN ====================
+    rectangle "Decorator Pattern (kz.texteditor.processing.decorator)" as DecoratorBox #F0FDF4;line:4ADE80;text:14532D {
+        interface TextProcessor <<interface, Component>> {
+            + {abstract} process(text : String) : String
+        }
+
+        class BaseTextProcessor <<ConcreteComponent, Context>> {
+            - strategy : CaseStrategy {readOnly}
+            --
+            + BaseTextProcessor(strategy : CaseStrategy)
+            + process(text : String) : String
+        }
+
+        abstract class TextProcessorDecorator <<abstract, BaseDecorator>> {
+            - delegate : TextProcessor {readOnly}
+            --
+            # TextProcessorDecorator(delegate : TextProcessor)
+            + process(text : String) : String
+        }
+
+        class WhitespaceDecorator <<ConcreteDecorator>> {
+            - {static} HORIZONTAL_SPACES_REGEX : Pattern {readOnly}
+            - {static} EDGE_SPACES_REGEX : Pattern {readOnly}
+            --
+            + WhitespaceDecorator(delegate : TextProcessor)
+            + process(text : String) : String
+        }
+
+        class PunctuationDecorator <<ConcreteDecorator>> {
+            - {static} STRIP_SPACES_REGEX : Pattern {readOnly}
+            - {static} NORMALIZE_AFTER_REGEX : Pattern {readOnly}
+            --
+            + PunctuationDecorator(delegate : TextProcessor)
+            + process(text : String) : String
+        }
+
+        class QuotesDecorator <<ConcreteDecorator>> {
+            - {static} GUILLEMETS_REGEX : Pattern {readOnly}
+            - {static} DOUBLE_QUOTES_REGEX : Pattern {readOnly}
+            --
+            + QuotesDecorator(delegate : TextProcessor)
+            + process(text : String) : String
+        }
+    }
+
+    ' ==================== RELATIONSHIPS ====================
+    KeepCaseStrategy  .up.|> CaseStrategy
+    UpperCaseStrategy .up.|> CaseStrategy
+    LowerCaseStrategy .up.|> CaseStrategy
+
+    BaseTextProcessor      .up.|> TextProcessor
+    TextProcessorDecorator .up.|> TextProcessor
+    TextProcessorDecorator o-up-> "1" TextProcessor : -delegate
+
+    WhitespaceDecorator  -up-|> TextProcessorDecorator
+    PunctuationDecorator -up-|> TextProcessorDecorator
+    QuotesDecorator      -up-|> TextProcessorDecorator
+
+    BaseTextProcessor o-left-> "1" CaseStrategy : -strategy
+
+    ProcessingService *--> "3" CaseStrategy : -STRATEGIES
+    ProcessingService ..> BaseTextProcessor : <<creates>>
+    ProcessingService ..> TextProcessorDecorator : <<wraps>>
+}
+@enduml

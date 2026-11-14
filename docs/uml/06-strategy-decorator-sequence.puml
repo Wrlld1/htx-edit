@@ -1,0 +1,93 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam dpi 300
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam sequence {
+    ArrowColor #334155
+    LifeLineBorderColor #475569
+    LifeLineBackgroundColor #FFFFFF
+    ParticipantBorderColor #334155
+    ParticipantBackgroundColor #FFFFFF
+    ParticipantFontColor #0F172A
+    ParticipantFontStyle bold
+    BoxBorderColor #94A3B8
+    BoxFontColor #1E293B
+    BoxFontSize 12
+    NoteBackgroundColor #FFFBEB
+    NoteBorderColor #F59E0B
+}
+
+autonumber "<b>[00]"
+
+participant ":EditorFacade" as Facade
+
+box "Pipeline Assembler (processing)" #F8FAFC
+    participant ":ProcessingService" as Service
+end box
+
+box "Decorator Pattern (processing.decorator)" #F0FDF4
+    participant "quotes:\nQuotesDecorator" as Quotes
+    participant "punct:\nPunctuationDecorator" as Punct
+    participant "space:\nWhitespaceDecorator" as Space
+    participant "base:\nBaseTextProcessor" as Base
+end box
+
+box "Strategy Pattern (processing.strategy)" #EFF6FF
+    participant "LOWER:\nLowerCaseStrategy" as Strategy
+end box
+
+== 1. Dynamic Pipeline Assembly ==
+Facade -> Service : process("Он сказал : « ПРИВЕТ ,МИР ! »", options)
+activate Service
+
+Service -> Base ** : new BaseTextProcessor(LOWER)
+Service -> Space ** : new WhitespaceDecorator(base)
+Service -> Punct ** : new PunctuationDecorator(space)
+Service -> Quotes ** : new QuotesDecorator(punct)
+
+== 2. Recursive Delegation & Outward Transformation ==
+Service -> Quotes : process("Он сказал : « ПРИВЕТ ,МИР ! »")
+activate Quotes
+
+Quotes -> Punct : super.process(text)
+activate Punct
+
+Punct -> Space : super.process(text)
+activate Space
+
+Space -> Base : super.process(text)
+activate Base
+
+Base -> Strategy : apply("Он сказал : « ПРИВЕТ ,МИР ! »")
+activate Strategy
+Strategy --> Base : "он сказал : « привет ,мир ! »"
+deactivate Strategy
+
+Base --> Space : "он сказал : « привет ,мир ! »"
+deactivate Base
+
+note right of Space
+  1. Trims line edges
+  2. Collapses [ \t]+
+end note
+Space --> Punct : "он сказал : « привет ,мир ! »"
+deactivate Space
+
+note right of Punct
+  1. Removes spaces before [: , !]
+  2. Normalizes 1 space after [: ,]
+end note
+Punct --> Quotes : "он сказал: « привет, мир! »"
+deactivate Punct
+
+note right of Quotes
+  Trims inner spaces in «...»
+end note
+Quotes --> Service : "он сказал: «привет, мир!»"
+deactivate Quotes
+
+Service --> Facade : "он сказал: «привет, мир!»"
+deactivate Service
+@enduml

@@ -1,0 +1,111 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam dpi 300
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam sequence {
+    ArrowColor #334155
+    LifeLineBorderColor #475569
+    LifeLineBackgroundColor #FFFFFF
+    ParticipantBorderColor #334155
+    ParticipantBackgroundColor #FFFFFF
+    ParticipantFontColor #0F172A
+    ParticipantFontStyle bold
+    BoxBorderColor #94A3B8
+    BoxFontColor #1E293B
+    BoxFontSize 12
+    NoteBackgroundColor #FFFBEB
+    NoteBorderColor #F59E0B
+}
+
+autonumber "<b>[00]"
+
+actor User
+
+box "CLI & Facade Layer" #F5F3FF
+    participant ":ConsoleMenu" as Menu
+    participant ":EditorFacade" as Facade
+end box
+
+box "Processing Pipeline (Decorator & Strategy)" #F0FDF4
+    participant ":ProcessingService" as Proc
+    participant "chain:\nTextProcessor" as Chain
+end box
+
+box "State & Observers Layer" #ECFEFF
+    participant ":EditorModel" as Model
+    participant ":ResultObserver" as ResObs
+    participant ":StatisticsObserver" as StatObs
+end box
+
+box "Export Subsystem (Factory Method)" #FFF1F2
+    participant "job:\nExportJob" as Job
+    participant "exporter:\nTextExporter" as Exporter
+end box
+
+== 1. Process Text (Menu Option 4) ==
+User -> Menu : Selects "4. Обработать текст"
+activate Menu
+
+Menu -> Facade : processText()
+activate Facade
+
+Facade -> Model : snapshot()
+Model --> Facade : EditorSnapshot(sourceText, options)
+
+Facade -> Proc : process(sourceText, options)
+activate Proc
+Proc -> Chain : process(sourceText)
+activate Chain
+note right of Chain : Base(CaseStrategy)\n-> WhitespaceDecorator\n-> PunctuationDecorator\n-> QuotesDecorator
+Chain --> Proc : processedText
+deactivate Chain
+Proc --> Facade : processedText
+deactivate Proc
+
+Facade -> Model : setResult(processedText)
+activate Model
+
+Model -> ResObs : onChanged(snapshot)
+activate ResObs
+ResObs --> User : Prints "--- Результат ---"
+deactivate ResObs
+
+Model -> StatObs : onChanged(snapshot)
+activate StatObs
+StatObs -> StatObs : TextStatistics.of(source & result)
+deactivate StatObs
+
+Model --> Facade
+deactivate Model
+
+Facade --> Menu
+deactivate Facade
+
+Menu -> StatObs : resultStatistics()
+StatObs --> Menu : Optional<TextStatistics>
+Menu --> User : Prints "Статистика результата: ..."
+deactivate Menu
+
+== 2. Save Result (Menu Option 6 / 7) ==
+User -> Menu : Selects "6/7. Сохранить результат"
+activate Menu
+Menu -> Facade : saveResult(format, path)
+activate Facade
+Facade -> Model : snapshot()
+Model --> Facade : EditorSnapshot(resultCurrent = true)
+Facade -> Job : export(resultText, path)
+activate Job
+Job -> Job : createExporter()
+Job -> Exporter : write(resultText, path)
+activate Exporter
+Exporter --> Job
+deactivate Exporter
+Job --> Facade
+deactivate Job
+Facade --> Menu
+deactivate Facade
+Menu --> User : Prints "Результат сохранён"
+deactivate Menu
+@enduml

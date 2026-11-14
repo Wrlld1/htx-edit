@@ -1,0 +1,153 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam nodesep 45
+skinparam ranksep 55
+skinparam dpi 300
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+skinparam package {
+    BackgroundColor #FFFFFF
+    BorderColor #334155
+    BorderThickness 1.5
+    FontColor #0F172A
+    FontSize 14
+    FontStyle bold
+}
+
+skinparam rectangle {
+    BorderStyle dashed
+    BorderThickness 1.5
+    RoundCorner 10
+    FontSize 13
+    FontStyle bold
+}
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #475569
+    BorderThickness 1.2
+    HeaderBackgroundColor #F1F5F9
+    FontColor #0F172A
+    AttributeFontColor #1E293B
+    MethodFontColor #0F172A
+    StereotypeFontColor #475569
+    StereotypeFontSize 11
+    ArrowColor #334155
+}
+
+skinparam interface {
+    HeaderBackgroundColor #E2E8F0
+}
+
+package "Configuration & Export Subsystems" {
+
+    ' ==================== BUILDER PATTERN ====================
+    rectangle "Builder Pattern (kz.texteditor.processing.builder)" as BuilderBox #FFFBEB;line:F59E0B;text:78350F {
+        enum CaseMode <<enumeration>> {
+            KEEP
+            UPPER
+            LOWER
+        }
+
+        class ProcessingOptions <<record, Product>> {
+            - removeExtraSpaces : boolean {readOnly}
+            - fixPunctuation : boolean {readOnly}
+            - trimQuotes : boolean {readOnly}
+            - caseMode : CaseMode {readOnly}
+            --
+            + {static} builder() : Builder
+            + {static} defaults() : ProcessingOptions
+            + toBuilder() : Builder
+            + removeExtraSpaces() : boolean
+            + fixPunctuation() : boolean
+            + trimQuotes() : boolean
+            + caseMode() : CaseMode
+        }
+
+        class "ProcessingOptions.Builder" as OptionsBuilder <<Builder>> {
+            - removeExtraSpaces : boolean = false
+            - fixPunctuation : boolean = false
+            - trimQuotes : boolean = false
+            - caseMode : CaseMode = KEEP
+            --
+            + removeExtraSpaces(enabled : boolean) : Builder
+            + fixPunctuation(enabled : boolean) : Builder
+            + trimQuotes(enabled : boolean) : Builder
+            + caseMode(mode : CaseMode) : Builder
+            + build() : ProcessingOptions
+        }
+    }
+
+    ' ==================== FACTORY METHOD PATTERN ====================
+    rectangle "Factory Method Pattern (kz.texteditor.export.factory)" as FactoryBox #FFF1F2;line:FB7185;text:881337 {
+        enum ExportFormat <<enumeration>> {
+            TXT
+            HTML
+        }
+
+        package "creator" {
+            abstract class ExportJob <<abstract, Creator>> {
+                + final export(text : String, path : Path) : void
+                # {abstract} createExporter() : TextExporter
+            }
+
+            class TxtExportJob <<ConcreteCreator>> {
+                # createExporter() : TextExporter
+            }
+
+            class HtmlExportJob <<ConcreteCreator>> {
+                # createExporter() : TextExporter
+            }
+        }
+
+        package "product" {
+            interface TextExporter <<interface, Product>> {
+                + {abstract} write(text : String, path : Path) : void
+            }
+
+            class TxtExporter <<ConcreteProduct>> {
+                - fileService : FileService {readOnly}
+                --
+                + write(text : String, path : Path) : void
+            }
+
+            class HtmlExporter <<ConcreteProduct>> {
+                - fileService : FileService {readOnly}
+                --
+                + write(text : String, path : Path) : void
+            }
+        }
+    }
+
+    ' ==================== FILE SERVICE ====================
+    rectangle "I/O Subsystem (kz.texteditor.service)" as FileBox #F8FAFC;line:94A3B8;text:334155 {
+        class FileService <<Service>> {
+            + read(path : Path) : String
+            + write(text : String, path : Path) : void
+            + exists(path : Path) : boolean
+        }
+    }
+
+    ' ==================== RELATIONSHIPS ====================
+    ProcessingOptions +-- OptionsBuilder
+    OptionsBuilder ..> ProcessingOptions : <<builds>>
+    ProcessingOptions *--> "1" CaseMode : -caseMode
+
+    TxtExportJob  -up-|> ExportJob
+    HtmlExportJob -up-|> ExportJob
+
+    TxtExporter  .up.|> TextExporter
+    HtmlExporter .up.|> TextExporter
+
+    ExportJob     ..> TextExporter : <<uses>>
+    TxtExportJob  ..> TxtExporter : <<creates>>
+    HtmlExportJob ..> HtmlExporter : <<creates>>
+
+    TxtExporter  *--> "1" FileService : -fileService
+    HtmlExporter *--> "1" FileService : -fileService
+}
+@enduml

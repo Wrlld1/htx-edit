@@ -1,0 +1,91 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam dpi 300
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam sequence {
+    ArrowColor #334155
+    LifeLineBorderColor #475569
+    LifeLineBackgroundColor #FFFFFF
+    ParticipantBorderColor #334155
+    ParticipantBackgroundColor #FFFFFF
+    ParticipantFontColor #0F172A
+    ParticipantFontStyle bold
+    BoxBorderColor #94A3B8
+    BoxFontColor #1E293B
+    BoxFontSize 12
+    NoteBackgroundColor #FFFBEB
+    NoteBorderColor #F59E0B
+}
+
+autonumber "<b>[00]"
+
+participant ":ConsoleMenu" as Menu
+participant ":EditorFacade" as Facade
+
+box "Builder Pattern (processing.builder)" #FFFBEB
+    participant "current:\nProcessingOptions" as Opts
+    participant "builder:\nProcessingOptions.Builder" as Builder
+    participant "updated:\nProcessingOptions" as NewOpts
+end box
+
+box "Factory Method Pattern (export.factory)" #FFF1F2
+    participant "job:\nHtmlExportJob" as Job
+    participant "exporter:\nHtmlExporter" as Exporter
+end box
+
+box "I/O Subsystem (service)" #F8FAFC
+    participant ":FileService" as FileSvc
+end box
+
+== 1. Configure Processing Options via Builder ==
+Menu -> Opts : toBuilder()
+activate Opts
+Opts -> Builder ** : new Builder()
+Opts --> Menu : builder
+deactivate Opts
+
+Menu -> Builder : fixPunctuation(true)
+activate Builder
+Builder --> Menu : this
+Menu -> Builder : caseMode(CaseMode.LOWER)
+Builder --> Menu : this
+Menu -> Builder : build()
+Builder -> NewOpts ** : new ProcessingOptions(false, true, false, LOWER)
+Builder --> Menu : updated
+deactivate Builder
+
+Menu -> Facade : updateOptions(updated)
+
+== 2. Export Result via Factory Method ==
+Menu -> Facade : saveResult(ExportFormat.HTML, "result.html")
+activate Facade
+
+Facade -> Job : export("привет, мир!", path)
+activate Job
+
+Job -> Job : createExporter()
+activate Job
+Job -> Exporter ** : new HtmlExporter()
+deactivate Job
+
+Job -> Exporter : write("привет, мир!", path)
+activate Exporter
+note right of Exporter
+  Escapes [& < > " ']
+  and wraps in UTF-8 <pre>
+end note
+Exporter -> FileSvc : write(htmlDocument, path)
+activate FileSvc
+FileSvc --> Exporter
+deactivate FileSvc
+Exporter --> Job
+deactivate Exporter
+
+Job --> Facade
+deactivate Job
+
+Facade --> Menu
+deactivate Facade
+@enduml

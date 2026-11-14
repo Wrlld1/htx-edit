@@ -1,0 +1,207 @@
+@startuml
+' ==================== CLEAN ARCHITECTURAL OVERVIEW ====================
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam nodesep 35
+skinparam ranksep 45
+skinparam dpi 300
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+hide empty members
+
+skinparam rectangle {
+    BorderStyle dashed
+    BorderThickness 1.5
+    RoundCorner 10
+    FontSize 12
+    FontStyle bold
+}
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #475569
+    BorderThickness 1.2
+    HeaderBackgroundColor #F1F5F9
+    FontColor #0F172A
+    StereotypeFontColor #475569
+    StereotypeFontSize 10
+    ArrowColor #334155
+}
+
+skinparam interface {
+    HeaderBackgroundColor #E2E8F0
+}
+
+' ==================== ENTRY POINT & UI ====================
+rectangle "Entry Point & CLI (kz.texteditor / console)" as EntryBox #F8FAFC;line:94A3B8;text:334155 {
+    class Main <<Bootstrap>> {
+        + {static} main(args : String[]) : void
+    }
+    class ConsoleMenu <<Controller>> {
+        + run() : void
+    }
+}
+
+' ==================== FACADE PATTERN ====================
+rectangle "Facade Pattern (Structural)" as FacadeBox #F5F3FF;line:A78BFA;text:4C1D95 {
+    class EditorFacade <<Facade>> {
+        + open(path : String) : void
+        + updateSource(text : String) : void
+        + updateOptions(options : ProcessingOptions) : void
+        + processText() : void
+        + saveResult(format : ExportFormat, path : String) : void
+    }
+    class FileService <<Subsystem>> {
+        + read(path : Path) : String
+        + write(text : String, path : Path) : void
+    }
+    class EditorException <<Exception>>
+}
+
+' ==================== OBSERVER PATTERN ====================
+rectangle "Observer Pattern (Behavioral)" as ObserverBox #ECFEFF;line:22D3EE;text:164E63 {
+    class EditorModel <<Subject>> {
+        + addObserver(o : EditorObserver) : void
+        + removeObserver(o : EditorObserver) : void
+        + setSource(text : String) : void
+        + setOptions(options : ProcessingOptions) : void
+        + setResult(text : String) : void
+    }
+    class EditorSnapshot <<record, EventState>>
+    interface EditorObserver <<interface, Observer>> {
+        + {abstract} onChanged(snapshot : EditorSnapshot) : void
+    }
+    class ResultObserver <<ConcreteObserver>> {
+        + onChanged(snapshot : EditorSnapshot) : void
+    }
+    class StatisticsObserver <<ConcreteObserver>> {
+        + onChanged(snapshot : EditorSnapshot) : void
+    }
+    class TextStatistics <<record>>
+}
+
+' ==================== BUILDER PATTERN ====================
+rectangle "Builder Pattern (Creational)" as BuilderBox #FFFBEB;line:F59E0B;text:78350F {
+    class ProcessingOptions <<record, Product>> {
+        + {static} builder() : Builder
+        + toBuilder() : Builder
+    }
+    class "ProcessingOptions.Builder" as OptionsBuilder <<Builder>> {
+        + removeExtraSpaces(b : boolean) : Builder
+        + fixPunctuation(b : boolean) : Builder
+        + trimQuotes(b : boolean) : Builder
+        + caseMode(m : CaseMode) : Builder
+        + build() : ProcessingOptions
+    }
+    enum CaseMode <<enumeration>> {
+        KEEP
+        UPPER
+        LOWER
+    }
+}
+
+' ==================== PROCESSING PIPELINE ====================
+rectangle "Processing Subsystem (kz.texteditor.processing)" as ProcBox #F8FAFC;line:94A3B8;text:334155 {
+    class ProcessingService <<PipelineAssembler>> {
+        + process(text : String, options : ProcessingOptions) : String
+    }
+
+    ' ==================== STRATEGY PATTERN ====================
+    rectangle "Strategy Pattern (Behavioral)" as StrategyBox #EFF6FF;line:60A5FA;text:1E3A8A {
+        interface CaseStrategy <<interface, Strategy>> {
+            + {abstract} apply(text : String) : String
+        }
+        class KeepCaseStrategy <<ConcreteStrategy>>
+        class UpperCaseStrategy <<ConcreteStrategy>>
+        class LowerCaseStrategy <<ConcreteStrategy>>
+    }
+
+    ' ==================== DECORATOR PATTERN ====================
+    rectangle "Decorator Pattern (Structural)" as DecoratorBox #F0FDF4;line:4ADE80;text:14532D {
+        interface TextProcessor <<interface, Component>> {
+            + {abstract} process(text : String) : String
+        }
+        class BaseTextProcessor <<ConcreteComponent, Context>>
+        abstract class TextProcessorDecorator <<abstract, BaseDecorator>> {
+            - delegate : TextProcessor
+        }
+        class WhitespaceDecorator <<ConcreteDecorator>>
+        class PunctuationDecorator <<ConcreteDecorator>>
+        class QuotesDecorator <<ConcreteDecorator>>
+    }
+}
+
+' ==================== FACTORY METHOD PATTERN ====================
+rectangle "Factory Method Pattern (Creational)" as FactoryBox #FFF1F2;line:FB7185;text:881337 {
+    enum ExportFormat <<enumeration>> {
+        TXT
+        HTML
+    }
+    abstract class ExportJob <<abstract, Creator>> {
+        + export(text : String, path : Path) : void
+        # {abstract} createExporter() : TextExporter
+    }
+    class TxtExportJob <<ConcreteCreator>>
+    class HtmlExportJob <<ConcreteCreator>>
+
+    interface TextExporter <<interface, Product>> {
+        + {abstract} write(text : String, path : Path) : void
+    }
+    class TxtExporter <<ConcreteProduct>>
+    class HtmlExporter <<ConcreteProduct>>
+}
+
+' ==================== KEY ARCHITECTURAL WIRING ====================
+Main ..> ConsoleMenu : starts
+Main ..> EditorFacade : wires
+ConsoleMenu --> EditorFacade : delegates actions
+ConsoleMenu --> StatisticsObserver : queries stats
+ConsoleMenu ..> OptionsBuilder : configures
+
+EditorFacade --> EditorModel : updates state
+EditorFacade --> ProcessingService : processes text
+EditorFacade --> FileService : reads UTF-8
+EditorFacade --> ExportJob : exports via Map
+EditorFacade ..> EditorException : throws
+
+EditorModel o--> "*" EditorObserver : notifies
+EditorModel ..> EditorSnapshot : emits
+EditorSnapshot --> ProcessingOptions : holds
+ResultObserver .up.|> EditorObserver
+StatisticsObserver .up.|> EditorObserver
+StatisticsObserver ..> TextStatistics : computes
+
+ProcessingOptions +-- OptionsBuilder
+OptionsBuilder ..> ProcessingOptions : <<builds>>
+ProcessingOptions --> CaseMode
+
+ProcessingService ..> ProcessingOptions : reads
+ProcessingService *--> CaseStrategy : selects
+ProcessingService ..> BaseTextProcessor : creates
+ProcessingService ..> TextProcessorDecorator : wraps
+
+KeepCaseStrategy .up.|> CaseStrategy
+UpperCaseStrategy .up.|> CaseStrategy
+LowerCaseStrategy .up.|> CaseStrategy
+
+BaseTextProcessor .up.|> TextProcessor
+TextProcessorDecorator .up.|> TextProcessor
+TextProcessorDecorator o--> "1" TextProcessor : -delegate
+BaseTextProcessor o-left-> "1" CaseStrategy : -strategy
+
+WhitespaceDecorator -up-|> TextProcessorDecorator
+PunctuationDecorator -up-|> TextProcessorDecorator
+QuotesDecorator -up-|> TextProcessorDecorator
+
+TxtExportJob -up-|> ExportJob
+HtmlExportJob -up-|> ExportJob
+ExportJob ..> TextExporter : <<creates & uses>>
+TxtExportJob ..> TxtExporter : <<creates>>
+HtmlExportJob ..> HtmlExporter : <<creates>>
+TxtExporter .up.|> TextExporter
+HtmlExporter .up.|> TextExporter
+TxtExporter --> FileService : writes
+HtmlExporter --> FileService : writes
+@enduml

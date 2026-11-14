@@ -1,0 +1,173 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam shadowing false
+skinparam roundcorner 6
+skinparam nodesep 45
+skinparam ranksep 55
+skinparam dpi 300
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+skinparam package {
+    BackgroundColor #FFFFFF
+    BorderColor #334155
+    BorderThickness 1.5
+    FontColor #0F172A
+    FontSize 14
+    FontStyle bold
+}
+
+skinparam rectangle {
+    BorderStyle dashed
+    BorderThickness 1.5
+    RoundCorner 10
+    FontSize 13
+    FontStyle bold
+}
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #475569
+    BorderThickness 1.2
+    HeaderBackgroundColor #F1F5F9
+    FontColor #0F172A
+    AttributeFontColor #1E293B
+    MethodFontColor #0F172A
+    StereotypeFontColor #475569
+    StereotypeFontSize 11
+    ArrowColor #334155
+}
+
+skinparam interface {
+    HeaderBackgroundColor #E2E8F0
+}
+
+package "Application Core: CLI, Facade & Observer Subsystems" {
+
+    ' ==================== ENTRY & CONSOLE ====================
+    rectangle "Bootstrap & CLI (kz.texteditor / console)" as CliBox #F8FAFC;line:94A3B8;text:334155 {
+        class Main <<Bootstrap>> {
+            - Main()
+            + {static} main(args : String[]) : void
+        }
+
+        class ConsoleMenu <<Controller>> {
+            - {static} END_MARKER : String = ":end" {readOnly}
+            - {static} INVALID_CHOICE : String {readOnly}
+            - {static} YES : Set<String> {readOnly}
+            - facade : EditorFacade {readOnly}
+            - statistics : StatisticsObserver {readOnly}
+            - in : BufferedReader {readOnly}
+            - out : PrintStream {readOnly}
+            --
+            + ConsoleMenu(facade : EditorFacade, statistics : StatisticsObserver, in : BufferedReader, out : PrintStream)
+            + run() : void
+        }
+    }
+
+    ' ==================== FACADE PATTERN ====================
+    rectangle "Facade Pattern (kz.texteditor.service.facade)" as FacadeBox #F5F3FF;line:A78BFA;text:4C1D95 {
+        class EditorFacade <<Facade>> {
+            + {static} NOT_PROCESSED_MESSAGE : String {readOnly}
+            - model : EditorModel {readOnly}
+            - processingService : ProcessingService {readOnly}
+            - fileService : FileService {readOnly}
+            - exportJobs : Map<ExportFormat, ExportJob> {readOnly}
+            --
+            + EditorFacade(model : EditorModel, processingService : ProcessingService, fileService : FileService, exportJobs : Map<ExportFormat, ExportJob>)
+            + open(path : String) : void
+            + updateSource(text : String) : void
+            + updateOptions(options : ProcessingOptions) : void
+            + processText() : void
+            + saveResult(format : ExportFormat, path : String) : void
+            + canSave() : boolean
+            + fileExists(path : String) : boolean
+            + getSnapshot() : EditorSnapshot
+        }
+
+        class EditorException <<RuntimeException>> {
+            + EditorException(message : String)
+            + EditorException(message : String, cause : Throwable)
+        }
+    }
+
+    ' ==================== OBSERVER PATTERN ====================
+    rectangle "Observer Pattern (model.observer & console.observer)" as ObserverBox #ECFEFF;line:22D3EE;text:164E63 {
+        class EditorModel <<Subject>> {
+            - observers : List<EditorObserver> {readOnly}
+            - sourceText : String
+            - resultText : String
+            - options : ProcessingOptions
+            - resultCurrent : boolean
+            - resultVersion : long
+            --
+            + addObserver(observer : EditorObserver) : void
+            + removeObserver(observer : EditorObserver) : void
+            + setSource(text : String) : void
+            + setOptions(newOptions : ProcessingOptions) : void
+            + setResult(text : String) : void
+            + snapshot() : EditorSnapshot
+            - markStaleAndNotify() : void
+            - notifyObservers() : void
+        }
+
+        class EditorSnapshot <<record, EventState>> {
+            - sourceText : String {readOnly}
+            - resultText : String {readOnly}
+            - options : ProcessingOptions {readOnly}
+            - resultCurrent : boolean {readOnly}
+            - resultVersion : long {readOnly}
+            --
+            + hasResult() : boolean
+        }
+
+        interface EditorObserver <<interface, Observer>> {
+            + {abstract} onChanged(snapshot : EditorSnapshot) : void
+        }
+
+        class ResultObserver <<ConcreteObserver>> {
+            - out : PrintStream {readOnly}
+            - lastShownVersion : long
+            - lastCurrent : boolean
+            --
+            + ResultObserver(out : PrintStream)
+            + onChanged(snapshot : EditorSnapshot) : void
+        }
+
+        class StatisticsObserver <<ConcreteObserver>> {
+            - sourceStatistics : TextStatistics
+            - resultStatistics : TextStatistics
+            --
+            + onChanged(snapshot : EditorSnapshot) : void
+            + sourceStatistics() : TextStatistics
+            + resultStatistics() : Optional<TextStatistics>
+        }
+
+        class TextStatistics <<record, ValueObject>> {
+            - characters : int {readOnly}
+            - words : int {readOnly}
+            - lines : int {readOnly}
+            --
+            + {static} of(text : String) : TextStatistics
+            + toString() : String
+        }
+    }
+
+    ' ==================== RELATIONSHIPS ====================
+    Main ..> ConsoleMenu : <<creates>>
+    Main ..> EditorFacade : <<creates>>
+    ConsoleMenu o--> "1" EditorFacade : -facade
+    ConsoleMenu o--> "1" StatisticsObserver : -statistics
+
+    EditorFacade o--> "1" EditorModel : -model
+    EditorFacade ..> EditorException : <<throws>>
+
+    EditorModel o--> "*" EditorObserver : -observers
+    EditorModel ..> EditorSnapshot : <<creates>>
+
+    ResultObserver     .up.|> EditorObserver
+    StatisticsObserver .up.|> EditorObserver
+    StatisticsObserver *--> "1..2" TextStatistics : computes
+}
+@enduml
