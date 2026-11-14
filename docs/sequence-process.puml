@@ -1,0 +1,13 @@
+@startuml
+title processText(): Facade -> Model -> Observers
+actor User
+User -> ConsoleMenu : 4
+ConsoleMenu -> EditorFacade : processText()
+EditorFacade -> EditorModel : snapshot()
+EditorFacade -> ProcessingService : process(source, options)
+ProcessingService --> EditorFacade : result
+EditorFacade -> EditorModel : setResult(result)
+EditorModel -> ResultObserver : onChanged(snapshot)
+EditorModel -> StatisticsObserver : onChanged(snapshot)
+ConsoleMenu -> StatisticsObserver : resultStatistics()
+@enduml

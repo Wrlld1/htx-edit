@@ -1,0 +1,64 @@
+@startuml
+title Facade + Observer
+
+package console {
+  class ConsoleMenu {
+    +run()
+  }
+  class ResultObserver
+  class StatisticsObserver {
+    +sourceStatistics()
+    +resultStatistics()
+  }
+  class TextStatistics <<record>> {
+    characters; words; lines
+    +of(text)
+  }
+}
+
+package model {
+  interface EditorObserver {
+    +onChanged(snapshot)
+  }
+  class EditorModel {
+    +addObserver(o)
+    +removeObserver(o)
+    +setSource(text)
+    +setOptions(options)
+    +setResult(text)
+    +snapshot()
+    -notifyObservers()
+  }
+  class EditorSnapshot <<record>> {
+    sourceText; resultText
+    options; resultCurrent; resultVersion
+  }
+}
+
+package service {
+  class EditorFacade {
+    +open(path)
+    +updateSource(text)
+    +updateOptions(options)
+    +processText()
+    +saveResult(format, path)
+    +canSave()
+  }
+  class FileService
+}
+
+class ProcessingService
+abstract class ExportJob
+
+ConsoleMenu --> EditorFacade
+ConsoleMenu --> StatisticsObserver : reads stats
+EditorFacade --> EditorModel
+EditorFacade --> ProcessingService
+EditorFacade --> FileService
+EditorFacade --> ExportJob : Map<ExportFormat, ExportJob>
+EditorModel o--> "*" EditorObserver
+EditorModel ..> EditorSnapshot : creates
+ResultObserver ..|> EditorObserver
+StatisticsObserver ..|> EditorObserver
+StatisticsObserver ..> TextStatistics
+@enduml
