@@ -6,16 +6,18 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class WhitespaceDecoratorTest {
+class WhitespaceDecoratorTest {
     private final WhitespaceDecorator decorator = new WhitespaceDecorator(
                                                   new BaseTextProcessor(
                                                   new KeepCaseStrategy()));
 
     @ParameterizedTest
     @CsvSource({
+            "'hello   world', 'hello world'",
             "'  hello   world  ', 'hello world'",
             "'\thello \t\t world\t', 'hello world'",
             "'  line 1  \n   \n\tline   2\t\n', 'line 1\n\nline 2\n'",
+            "'   \t   ', ''",
             "'', ''"
     })
     void rulesAreEnforced(String input, String expected) {

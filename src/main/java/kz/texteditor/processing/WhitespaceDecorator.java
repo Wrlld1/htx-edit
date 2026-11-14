@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 public class WhitespaceDecorator extends TextProcessorDecorator {
     private static final Pattern HORIZONTAL_SPACES_REGEX =
             Pattern.compile("[ \\t]+");
+    private static final Pattern EDGE_SPACES_REGEX =
+            Pattern.compile("^[ \\t]+|[ \\t]+$");
 
     public WhitespaceDecorator(TextProcessor delegate) {
         super(delegate);
@@ -20,9 +22,8 @@ public class WhitespaceDecorator extends TextProcessorDecorator {
         String processedText = super.process(text);
         String[] splitText = processedText.split("\n", -1);
         for (int i = 0; i < splitText.length; i++) {
-            String noWhitespaceText = splitText[i].trim();
-            noWhitespaceText = HORIZONTAL_SPACES_REGEX.matcher(noWhitespaceText).replaceAll(" ");
-            splitText[i] = noWhitespaceText;
+            String trimmedLine = EDGE_SPACES_REGEX.matcher(splitText[i]).replaceAll("");
+            splitText[i] = HORIZONTAL_SPACES_REGEX.matcher(trimmedLine).replaceAll(" ");
         }
         return String.join("\n", splitText);
     }
