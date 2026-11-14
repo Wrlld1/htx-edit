@@ -11,7 +11,7 @@ public class PunctuationDecorator extends TextProcessorDecorator {
     private static final Pattern STRIP_SPACES_REGEX =
             Pattern.compile("[ \\t]+(?=[.,!?:;])");
     private static final Pattern NORMALIZE_AFTER_REGEX =
-            Pattern.compile("(?m)([.,!?:;]+)[ \\t]*(?![ \\t.,!?:;\\r\\n»\"]|$)");
+            Pattern.compile("(?m)([.,!?:;]+)[ \\t]*(?![ \\t.,!?:;\\r\\n»]|\"(?:[^\"\\r\\n]*\"[^\"\\r\\n]*\")*[^\"\\r\\n]*$|$)");
 
     public PunctuationDecorator(TextProcessor delegate) {
         super(delegate);

@@ -6,7 +6,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PunctuationDecoratorTest {
+class PunctuationDecoratorTest {
     private final PunctuationDecorator decorator = new PunctuationDecorator(
                                                    new BaseTextProcessor(
                                                    new KeepCaseStrategy()));
@@ -14,10 +14,15 @@ public class PunctuationDecoratorTest {
     @ParameterizedTest
     @CsvSource({
             "'Привет ,мир !', 'Привет, мир!'",
+            "'Подожди ...что ?!', 'Подожди... что?!'",
             "'Подожди ... что ?!', 'Подожди... что?!'",
             "'Привет,   мир!', 'Привет, мир!'",
             "'«Привет ,мир!»', '«Привет, мир!»'",
             "'\"Привет ,мир!\"', '\"Привет, мир!\"'",
+            "'Он сказал :«Привет ,мир!»', 'Он сказал: «Привет, мир!»'",
+            "'Он сказал :\"Привет ,мир!\"', 'Он сказал: \"Привет, мир!\"'",
+            "'Он сказал:   \"Привет ,мир!\"', 'Он сказал: \"Привет, мир!\"'",
+            "'Привет ,\"мир\"', 'Привет, \"мир\"'",
             "'Привет ,мир !\nПока ,мир .', 'Привет, мир!\nПока, мир.'",
             "'', ''"
     })

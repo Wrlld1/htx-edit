@@ -6,17 +6,19 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class QuotesDecoratorTest {
+class QuotesDecoratorTest {
     private final QuotesDecorator decorator = new QuotesDecorator(
                                               new BaseTextProcessor(
                                               new KeepCaseStrategy()));
 
     @ParameterizedTest
     @CsvSource({
+            "'« hello world »', '«hello world»'",
             "'« Привет, мир! »', '«Привет, мир!»'",
             "'\" Привет, мир! \"', '\"Привет, мир!\"'",
             "'«\t  Привет  \t»', '«Привет»'",
             "'« один » и \" два \" и \" три \"', '«один» и \"два\" и \"три\"'",
+            "'« Привет, \" мир \"! »', '«Привет, \"мир\"!»'",
             "'\" Привет \"\n« мир »', '\"Привет\"\n«мир»'",
             "'', ''"
     })
