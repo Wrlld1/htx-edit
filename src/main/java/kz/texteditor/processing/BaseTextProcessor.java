@@ -15,6 +15,7 @@ public class BaseTextProcessor implements TextProcessor {
 
     @Override
     public String process(String text) {
+        Objects.requireNonNull(text, "Input text cannot be null");
         return strategy.apply(text);
     }
 }

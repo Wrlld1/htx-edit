@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class CaseProcessingTest {
+class CaseProcessingTest {
     private static final CaseStrategy UPPER = new UpperCaseStrategy();
     private static final CaseStrategy LOWER = new LowerCaseStrategy();
     private static final CaseStrategy KEEP = new KeepCaseStrategy();
@@ -16,8 +16,8 @@ public class CaseProcessingTest {
     @ParameterizedTest
     @CsvSource({
             "hello, HELLO",
-            "привет, ПРИВЕТ",
-            "сәлем, СӘЛЕМ",
+            "привет ёжик, ПРИВЕТ ЁЖИК",
+            "сәлем әіңғүұқөһ, СӘЛЕМ ӘІҢҒҮҰҚӨҺ",
             "'Привет, World!', 'ПРИВЕТ, WORLD!'",
             "'', ''"
     })
@@ -29,8 +29,8 @@ public class CaseProcessingTest {
     @ParameterizedTest
     @CsvSource({
             "HELLO, hello",
-            "ПРИВЕТ, привет",
-            "СӘЛЕМ, сәлем",
+            "ПРИВЕТ ЁЖИК, привет ёжик",
+            "СӘЛЕМ ӘІҢҒҮҰҚӨҺ, сәлем әіңғүұқөһ",
             "'ПРИВЕТ, World!', 'привет, world!'",
             "'', ''"
     })
@@ -42,8 +42,8 @@ public class CaseProcessingTest {
     @ParameterizedTest
     @CsvSource({
             "Hello, Hello",
-            "Привет, Привет",
-            "Сәлем, Сәлем",
+            "Привет Ёжик, Привет Ёжик",
+            "Сәлем Әіңғүұқөһ, Сәлем Әіңғүұқөһ",
             "'Привет, World!', 'Привет, World!'",
             "'', ''"
     })
@@ -71,6 +71,16 @@ public class CaseProcessingTest {
         BaseTextProcessor textProcessor = new BaseTextProcessor(strategy);
         String output = textProcessor.process(input);
         assertEquals(expected, output);
+    }
+
+    @Test
+    void nullInputThrowsExceptionAcrossAllStrategiesAndBaseProcessor() {
+        assertThrows(NullPointerException.class, () -> UPPER.apply(null));
+        assertThrows(NullPointerException.class, () -> LOWER.apply(null));
+        assertThrows(NullPointerException.class, () -> KEEP.apply(null));
+
+        BaseTextProcessor processor = new BaseTextProcessor(KEEP);
+        assertThrows(NullPointerException.class, () -> processor.process(null));
     }
 
     @Test
