@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ProcessingServiceTest {
+class ProcessingServiceTest {
     private final ProcessingService service = new ProcessingService();
 
     @ParameterizedTest
@@ -17,7 +17,13 @@ public class ProcessingServiceTest {
             "false, true,  false, KEEP,   '  « Привет , мир ! »  ', '  « Привет, мир! »  '",
             "false, false, true,  KEEP,   '  « Привет , мир ! »  ', '  «Привет , мир !»  '",
             "true,  true,  true,  UPPER,  '  « привет ,   мир ! »  ', '«ПРИВЕТ, МИР!»'",
-            "true,  true,  true,  LOWER,  '  \" ПРИВЕТ ,   МИР ! \"  ', '\"привет, мир!\"'"
+            "true,  true,  true,  LOWER,  '  \" ПРИВЕТ ,   МИР ! \"  ', '\"привет, мир!\"'",
+            "false, true,  false, LOWER,  'ПРИВЕТ ,мир !', 'привет, мир!'",
+            "true,  true,  true,  LOWER,  'Он сказал : « ПРИВЕТ ,МИР ! »', 'он сказал: «привет, мир!»'",
+            "true,  true,  true,  LOWER,  'Он сказал : \" ПРИВЕТ ,МИР ! \"', 'он сказал: \"привет, мир!\"'",
+            "false, true,  false, KEEP,   'Подожди ...что ?!', 'Подожди... что?!'",
+            "false, false, false, KEEP,   '', ''",
+            "true,  true,  true,  LOWER,  '', ''"
     })
     void processAccordingToOptions(boolean spaces,
                                    boolean punct,
