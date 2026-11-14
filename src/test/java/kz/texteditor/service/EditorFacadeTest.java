@@ -1,12 +1,14 @@
 package kz.texteditor.service;
 
-import kz.texteditor.export.ExportFormat;
-import kz.texteditor.export.ExportJob;
-import kz.texteditor.export.HtmlExportJob;
-import kz.texteditor.export.TxtExportJob;
-import kz.texteditor.model.EditorModel;
-import kz.texteditor.processing.ProcessingOptions;
+import kz.texteditor.export.factory.ExportFormat;
+import kz.texteditor.export.factory.creator.ExportJob;
+import kz.texteditor.export.factory.creator.HtmlExportJob;
+import kz.texteditor.export.factory.creator.TxtExportJob;
+import kz.texteditor.model.observer.EditorModel;
+import kz.texteditor.processing.builder.ProcessingOptions;
 import kz.texteditor.processing.ProcessingService;
+import kz.texteditor.service.facade.EditorException;
+import kz.texteditor.service.facade.EditorFacade;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

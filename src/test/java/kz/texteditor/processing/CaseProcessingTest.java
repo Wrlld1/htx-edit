@@ -1,5 +1,13 @@
 package kz.texteditor.processing;
 
+import kz.texteditor.processing.decorator.BaseTextProcessor;
+import kz.texteditor.processing.decorator.PunctuationDecorator;
+import kz.texteditor.processing.decorator.QuotesDecorator;
+import kz.texteditor.processing.decorator.WhitespaceDecorator;
+import kz.texteditor.processing.strategy.CaseStrategy;
+import kz.texteditor.processing.strategy.KeepCaseStrategy;
+import kz.texteditor.processing.strategy.LowerCaseStrategy;
+import kz.texteditor.processing.strategy.UpperCaseStrategy;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.util.DefaultLocale;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -1,11 +1,12 @@
 package kz.texteditor.console;
 
-import kz.texteditor.export.ExportFormat;
-import kz.texteditor.model.EditorSnapshot;
-import kz.texteditor.processing.CaseMode;
-import kz.texteditor.processing.ProcessingOptions;
-import kz.texteditor.service.EditorException;
-import kz.texteditor.service.EditorFacade;
+import kz.texteditor.console.observer.StatisticsObserver;
+import kz.texteditor.export.factory.ExportFormat;
+import kz.texteditor.model.observer.EditorSnapshot;
+import kz.texteditor.processing.builder.CaseMode;
+import kz.texteditor.processing.builder.ProcessingOptions;
+import kz.texteditor.service.facade.EditorException;
+import kz.texteditor.service.facade.EditorFacade;
 
 import java.io.BufferedReader;
 import java.io.IOException;

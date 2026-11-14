@@ -1,8 +1,11 @@
 package kz.texteditor.console;
 
-import kz.texteditor.model.EditorModel;
-import kz.texteditor.processing.CaseMode;
-import kz.texteditor.processing.ProcessingOptions;
+import kz.texteditor.console.observer.ResultObserver;
+import kz.texteditor.console.observer.StatisticsObserver;
+import kz.texteditor.console.observer.TextStatistics;
+import kz.texteditor.model.observer.EditorModel;
+import kz.texteditor.processing.builder.CaseMode;
+import kz.texteditor.processing.builder.ProcessingOptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

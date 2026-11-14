@@ -1,5 +1,10 @@
 package kz.texteditor.processing;
 
+import kz.texteditor.processing.decorator.BaseTextProcessor;
+import kz.texteditor.processing.decorator.PunctuationDecorator;
+import kz.texteditor.processing.decorator.TextProcessor;
+import kz.texteditor.processing.strategy.KeepCaseStrategy;
+import kz.texteditor.processing.strategy.LowerCaseStrategy;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
