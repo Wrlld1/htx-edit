@@ -1,5 +1,5 @@
 @startuml
-skinparam backgroundColor #FFFFFF
+skinparam backgroundColor #FEFEFE
 skinparam classAttributeIconSize 0
 skinparam linetype ortho
 skinparam shadowing false
