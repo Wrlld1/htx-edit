@@ -1,4 +1,5 @@
 @startuml
+skinparam backgroundColor #FFFFFF
 ' ==================== CLEAN ARCHITECTURAL OVERVIEW ====================
 skinparam classAttributeIconSize 0
 skinparam linetype ortho

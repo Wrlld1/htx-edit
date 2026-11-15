@@ -1,4 +1,5 @@
 @startuml
+skinparam backgroundColor #FFFFFF
 ' ==================== STRICT & SLICK STYLING ====================
 skinparam classAttributeIconSize 0
 skinparam linetype ortho

@@ -1,4 +1,5 @@
 @startuml
+skinparam backgroundColor #FFFFFF
 skinparam shadowing false
 skinparam roundcorner 6
 skinparam dpi 300
