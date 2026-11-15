@@ -96,37 +96,87 @@ src/main/java/kz/texteditor/
 ## UML Diagrams
 
 ### System Overview
-![Architecture Overview](docs/uml/01-architecture-overview.svg)
+
+<table>
+  <tr>
+    <td align="center" bgcolor="#ffffff">
+      <img src="docs/uml/01-architecture-overview.svg" alt="Architecture Overview" width="100%">
+    </td>
+  </tr>
+</table>
 
 <details>
 <summary><strong>Builder & Factory Method (Configuration & Export)</strong></summary>
+<br>
 
 #### Class Diagram
-![Builder & Factory Class Diagram](docs/uml/03-builder-factory-export.svg)
+<table>
+  <tr>
+    <td align="center" bgcolor="#ffffff">
+      <img src="docs/uml/03-builder-factory-export.svg" alt="Builder & Factory Class Diagram" width="100%">
+    </td>
+  </tr>
+</table>
 
 #### Sequence Diagram
-![Builder & Factory Sequence Diagram](docs/uml/04-builder-factory-sequence.svg)
+<table>
+  <tr>
+    <td align="center" bgcolor="#ffffff">
+      <img src="docs/uml/04-builder-factory-sequence.svg" alt="Builder & Factory Sequence Diagram" width="100%">
+    </td>
+  </tr>
+</table>
+
 </details>
 
 <details>
 <summary><strong>Strategy & Decorator (Processing Pipeline)</strong></summary>
+<br>
 
 #### Class Diagram
-![Strategy & Decorator Class Diagram](docs/uml/05-strategy-decorator-processing.svg)
+<table>
+  <tr>
+    <td align="center" bgcolor="#ffffff">
+      <img src="docs/uml/05-strategy-decorator-processing.svg" alt="Strategy & Decorator Class Diagram" width="100%">
+    </td>
+  </tr>
+</table>
 
 #### Sequence Diagram
-![Strategy & Decorator Sequence Diagram](docs/uml/06-strategy-decorator-sequence.svg)
+<table>
+  <tr>
+    <td align="center" bgcolor="#ffffff">
+      <img src="docs/uml/06-strategy-decorator-sequence.svg" alt="Strategy & Decorator Sequence Diagram" width="100%">
+    </td>
+  </tr>
+</table>
+
 </details>
 
 <details>
 <summary><strong>Facade & Observer (Application Core & State)</strong></summary>
+<br>
 
 #### Class Diagram
-![Facade & Observer Class Diagram](docs/uml/07-facade-observer-core.svg)
+<table>
+  <tr>
+    <td align="center" bgcolor="#ffffff">
+      <img src="docs/uml/07-facade-observer-core.svg" alt="Facade & Observer Class Diagram" width="100%">
+    </td>
+  </tr>
+</table>
 
 #### Sequence Diagram
-![Facade & Observer Sequence Diagram](docs/uml/08-facade-observer-sequence.svg)
+<table>
+  <tr>
+    <td align="center" bgcolor="#ffffff">
+      <img src="docs/uml/08-facade-observer-sequence.svg" alt="Facade & Observer Sequence Diagram" width="100%">
+    </td>
+  </tr>
+</table>
+
 </details>
+
 
 ## Development
 
