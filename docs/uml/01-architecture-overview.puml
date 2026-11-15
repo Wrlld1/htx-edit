@@ -183,14 +183,14 @@ ProcessingService *--> CaseStrategy : selects
 ProcessingService ..> BaseTextProcessor : creates
 ProcessingService ..> TextProcessorDecorator : wraps
 
-KeepCaseStrategy .up.|> CaseStrategy
-UpperCaseStrategy .up.|> CaseStrategy
-LowerCaseStrategy .up.|> CaseStrategy
+CaseStrategy <|.. KeepCaseStrategy
+CaseStrategy <|.. UpperCaseStrategy
+CaseStrategy <|.. LowerCaseStrategy
 
-BaseTextProcessor .up.|> TextProcessor
-TextProcessorDecorator .up.|> TextProcessor
+TextProcessor <|.. BaseTextProcessor
+TextProcessor <|.. TextProcessorDecorator
 TextProcessorDecorator o--> "1" TextProcessor : -delegate
-BaseTextProcessor o-left-> "1" CaseStrategy : -strategy
+BaseTextProcessor o--> "1" CaseStrategy : -strategy
 
 WhitespaceDecorator -up-|> TextProcessorDecorator
 PunctuationDecorator -up-|> TextProcessorDecorator
